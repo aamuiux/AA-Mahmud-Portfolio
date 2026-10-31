@@ -1,1 +1,103 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --canvas: #ffffff;
+    --surface-grey: #f4f4f2;
+    --surface-light: #ffffff;
+    --surface-dark: #141413;
+    --ink: #141413;
+    --ink-muted: #52524e;
+    --ink-faint: #6e6e69;
+    --on-dark: #ffffff;
+    --on-dark-muted: rgba(255, 255, 255, 0.88);
+    --on-dark-faint: rgba(255, 255, 255, 0.72);
+    --line: rgba(20, 20, 19, 0.20);
+    --line-strong: rgba(20, 20, 19, 0.44);
+    --line-on-dark: rgba(255, 255, 255, 0.22);
+    --img-bg: #ecece9;
+  }
+
+  html.dark,
+  [data-theme="dark"] {
+    --canvas: #0c0c0b;
+    --surface-grey: #151513;
+    --surface-light: #1e1e1b;
+    --surface-dark: #060605;
+    --ink: #f7f7f5;
+    --ink-muted: #b8b8b3;
+    --ink-faint: #9c9c96;
+    --on-dark: #ffffff;
+    --on-dark-muted: rgba(255, 255, 255, 0.88);
+    --on-dark-faint: rgba(255, 255, 255, 0.72);
+    --line: rgba(247, 247, 245, 0.18);
+    --line-strong: rgba(247, 247, 245, 0.36);
+    --line-on-dark: rgba(255, 255, 255, 0.18);
+    --img-bg: #161614;
+  }
+
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: "Satoshi", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    transition: background-color 0.35s ease, color 0.35s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Space Grotesk", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: var(--ink);
+    color: var(--canvas);
+  }
+}
+
+/* Custom dashed border helpers */
+.rule-dashed {
+  border-top: 1px dashed var(--line);
+}
+.rule-dashed-b {
+  border-bottom: 1px dashed var(--line);
+}
+.rule-dashed-r {
+  border-right: 1px dashed var(--line);
+}
+.rule-dashed-l {
+  border-left: 1px dashed var(--line);
+}
+
+/* Scroll anchors */
+#works, #about, #process, #services, #acquire, #contact, #certifications, #experience, #skills, #awards {
+  scroll-margin-top: 5rem;
+}
+
+/* Pulse animation */
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
+}
+
+.badge-pulse {
+  animation: pulse-dot 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
