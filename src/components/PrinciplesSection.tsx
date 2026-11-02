@@ -1,67 +1,44 @@
 import React from 'react';
-import { Layers, Sparkles, TrendingUp } from 'lucide-react';
 
 export const PrinciplesSection: React.FC = () => {
-  const pillars = [
-    {
-      number: '01',
-      title: 'Enterprise Scale & Design Systems',
-      desc: 'Zero-drift token architecture and multi-brand component governance that cuts engineering rework in half and eliminates frontend ambiguity.',
-      icon: Layers,
-    },
-    {
-      number: '02',
-      title: 'AI-Native Workflows & Autonomy',
-      desc: 'Intuitive UX for non-deterministic AI models, streaming responses, cognitive scaffolding, and autonomous agent supervisor cockpits.',
-      icon: Sparkles,
-    },
-    {
-      number: '03',
-      title: 'Measurable Business ROI',
-      desc: 'Connecting interface ergonomics directly to user retention curves, reduced onboarding churn, and high-frequency transaction conversion velocity.',
-      icon: TrendingUp,
-    },
-  ];
-
   return (
-    <section className="py-16 lg:py-24 px-6 sm:px-10 lg:px-14 border-b border-dashed border-[var(--line)]">
-      <div className="mb-14">
-        <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--ink-muted)] mb-3">
-          <span className="w-6 h-[1px] bg-[var(--line-strong)]" />
-          <span>Core Principles</span>
+    <section className="principles-section section-pad rule-dashed" aria-label="Core Principles">
+      <div className="container">
+        <div className="section-heading">
+          <div className="eyebrow motion-fade" data-motion="fade">
+            <span className="eyebrow-line" aria-hidden="true"></span>
+            <span className="eyebrow-text">Core Principles</span>
+          </div>
+          <h2 className="section-heading-title" data-motion="line" data-stagger="90">
+            <span className="line-mask"><span className="line-inner">Three pillars of high-impact</span></span>
+            <span className="line-mask"><span className="line-inner">product design.</span></span>
+          </h2>
         </div>
-        <h2 className="text-3xl sm:text-5xl font-bold text-[var(--ink)] tracking-tight max-w-[20ch]">
-          Three pillars of high-impact product design.
-        </h2>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {pillars.map((pillar) => {
-          const Icon = pillar.icon;
-          return (
-            <div
-              key={pillar.number}
-              className="p-6 sm:p-8 bg-[var(--surface-grey)] border border-dashed border-[var(--line)] rounded flex flex-col justify-between gap-6"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-['Space_Grotesk'] text-sm font-semibold text-emerald-500 tracking-wider">
-                  {pillar.number}
-                </span>
-                <Icon className="w-5 h-5 text-[var(--ink-muted)]" />
-              </div>
+        <div className="principles-grid">
+          {/*  Card 01  */}
+          <article className="principle-card motion-fade-up" data-motion="fade-up" data-stagger-index="0" data-stagger="90">
+            <span className="principle-num">01</span>
+            <h3 className="principle-title">User-Validated Discovery &amp; ROI</h3>
+            <p className="principle-desc">Every design decision starts with real user behavior and commercial targets. By combining stakeholder interviews, qualitative research, and heuristic audits, I identify high-friction bottlenecks and anchor design to measurable retention and conversion metrics.</p>
+          </article>
 
-              <div>
-                <h3 className="font-['Space_Grotesk'] text-xl font-bold text-[var(--ink)] mb-3">
-                  {pillar.title}
-                </h3>
-                <p className="text-xs sm:text-sm text-[var(--ink-muted)] leading-relaxed">
-                  {pillar.desc}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+          {/*  Card 02  */}
+          <article className="principle-card motion-fade-up" data-motion="fade-up" data-stagger-index="1" data-stagger="90">
+            <span className="principle-num">02</span>
+            <h3 className="principle-title">Scalable Design Systems &amp; Tokens</h3>
+            <p className="principle-desc">Enterprise software requires unified governance. I build token-driven Figma libraries, accessible components (WCAG AA), and clear documentation that scale across 20+ squads — cutting front-end regression tickets and accelerating sprint velocity by 60%+.</p>
+          </article>
+
+          {/*  Card 03  */}
+          <article className="principle-card motion-fade-up" data-motion="fade-up" data-stagger-index="2" data-stagger="90">
+            <span className="principle-num">03</span>
+            <h3 className="principle-title">AI-Native UX &amp; High-Density Clarity</h3>
+            <p className="principle-desc">Modern intelligent platforms demand thoughtful human-in-the-loop workflows. I replace ambiguous prompt boxes with granular steering dials, progressive disclosure, and real-time feedback states that make complex AI feel predictable and empowering.</p>
+          </article>
+        </div>
       </div>
     </section>
+
   );
 };

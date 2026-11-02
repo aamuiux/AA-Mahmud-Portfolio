@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { X, ExternalLink, Mail } from 'lucide-react';
+import React from 'react';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -7,83 +6,49 @@ interface BookingModalProps {
 }
 
 export const BookingModal: React.FC<BookingModalProps> = ({ isOpen, onClose }) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-      window.addEventListener('keydown', handleKeyDown);
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   return (
     <div
+      className={`brief-modal-backdrop ${isOpen ? 'is-active' : ''}`}
+      id="booking-modal"
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[130] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-sm animate-fadeIn"
-      onClick={onClose}
+      aria-hidden={isOpen ? 'false' : 'true'}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <div
-        className="relative w-full max-w-3xl h-[85vh] max-h-[750px] bg-[var(--canvas)] border border-dashed border-[var(--line-strong)] rounded-lg overflow-hidden shadow-2xl flex flex-col"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Top Header */}
-        <div className="flex items-center justify-between p-4 px-6 border-b border-dashed border-[var(--line)] bg-[var(--surface-grey)]">
+      <div className="brief-modal-card booking-modal-card">
+        <div className="brief-modal-header" style={{ paddingBottom: '1rem', borderBottom: '1px dashed var(--line)' }}>
           <div>
-            <h3 className="font-['Space_Grotesk'] text-base font-bold text-[var(--ink)]">
-              Schedule 20-Min Intro Call
-            </h3>
-            <p className="text-xs text-[var(--ink-muted)]">
-              Direct with Abdullah Al Mahmud (Lead UI/UX Designer)
+            <span className="brief-badge" style={{ color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.3)' }}>Live Booking</span>
+            <h2 className="brief-title" style={{ fontSize: '1.5rem', marginTop: '0.25rem' }}>Schedule a 20-Minute Intro Call</h2>
+            <p style={{ margin: '0.35rem 0 0', fontSize: '0.85rem', color: 'var(--ink-muted)' }}>
+              Direct calendar access with AA Mahmud — Lead UI/UX Designer &amp; Product Strategist.
             </p>
           </div>
-
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1.5 rounded hover:bg-[var(--canvas)] text-[var(--ink)] transition-colors cursor-pointer"
-            aria-label="Close scheduling modal"
-          >
-            <X className="w-5 h-5" />
+          <button type="button" className="brief-close-btn" id="booking-modal-close" aria-label="Close Booking Modal" onClick={onClose}>
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 
-        {/* Calendly Embed Frame */}
-        <div className="flex-1 w-full bg-[var(--canvas)] relative">
+        <div className="booking-frame-wrap" style={{ position: 'relative', width: '100%', minHeight: '620px', background: 'var(--surface-grey)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <iframe
-            src="https://calendly.com/aamsaikat-ux/20min?hide_landing_page_details=1&hide_gdpr_banner=1"
+            className="booking-embed-frame"
+            src="https://calendly.com/aamsaikat-ux/20min?embed_domain=localhost&embed_type=Inline&hide_landing_page_details=1&hide_gdpr_banner=1"
             title="Schedule 20-Min Intro Call with AA Mahmud"
-            className="w-full h-full border-0"
             loading="lazy"
+            style={{ width: '100%', height: '620px', border: 'none' }}
           />
         </div>
 
-        {/* Fallback footer */}
-        <div className="p-3 px-6 bg-[var(--surface-grey)] border-t border-dashed border-[var(--line)] flex flex-wrap items-center justify-between gap-3 text-xs text-[var(--ink-muted)]">
-          <span>Prefer direct booking outside the modal?</span>
-          <div className="flex items-center gap-2">
-            <a
-              href="https://calendly.com/aamsaikat-ux/20min"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-[var(--ink)] text-[var(--canvas)] rounded text-[0.6875rem] font-medium"
-            >
-              <span>Open on Calendly</span>
-              <ExternalLink className="w-3 h-3" />
+        <div className="booking-fallback-bar">
+          <span>Prefer direct link? Open outside modal:</span>
+          <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+            <a href="https://calendly.com/aamsaikat-ux/20min" target="_blank" rel="noopener noreferrer" className="cta-btn solid-light" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}>
+              Open on Calendly.com ↗
             </a>
-            <a
-              href="mailto:aam.uiux@gmail.com?subject=20-Min%20Intro%20Call%20Request"
-              className="inline-flex items-center gap-1.5 px-3 py-1 border border-dashed border-[var(--line)] rounded text-[0.6875rem] font-medium text-[var(--ink)]"
-            >
-              <Mail className="w-3 h-3" />
-              <span>Email</span>
+            <a href="mailto:aam.uiux@gmail.com?subject=20-Min%20Intro%20Call%20Request" className="cta-btn ghost-light" style={{ padding: '0.5rem 1rem', fontSize: '0.75rem' }}>
+              Email Directly
             </a>
           </div>
         </div>

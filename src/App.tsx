@@ -1,37 +1,36 @@
-import { useState, useEffect } from 'react';
-import type { CategoryKey, Project, ThemeMode, ViewType } from './types';
-import {
-  projects,
-  testimonials,
-  experienceData,
-  skillCategories,
-  certifications,
-  awards,
-} from './data';
+import React, { useState, useEffect, useRef } from 'react';
+import type { CategoryKey, ThemeMode, ViewType, BriefData } from './types';
 import { Sidebar } from './components/Sidebar';
-import { MobileHeader } from './components/MobileHeader';
+import { MobileTopBar } from './components/MobileTopBar';
 import { HeroSection } from './components/HeroSection';
-import { WorksSection } from './components/WorksSection';
+import { StatementSection } from './components/StatementSection';
+import { AboutSection } from './components/AboutSection';
 import { PrinciplesSection } from './components/PrinciplesSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { EngagementsSection } from './components/EngagementsSection';
 import { FaqSection } from './components/FaqSection';
-import { ContactSection } from './components/ContactSection';
-import { Footer } from './components/Footer';
+import { PreFooterCta } from './components/PreFooterCta';
 import { ShowcaseView } from './components/ShowcaseView';
 import { ProfileView } from './components/ProfileView';
-import { ProjectModal } from './components/ProjectModal';
-import { BookingModal } from './components/BookingModal';
+import { Footer } from './components/Footer';
 import { BackToTop } from './components/BackToTop';
+import { MenuOverlay } from './components/MenuOverlay';
+import { BriefModal } from './components/BriefModal';
+import { BookingModal } from './components/BookingModal';
+import Lenis from 'lenis';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<ViewType>('home');
   const [currentCategory, setCurrentCategory] = useState<CategoryKey>('all');
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isBookingOpen, setIsBookingOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [menuOverlayOpen, setMenuOverlayOpen] = useState(false);
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [activeBrief, setActiveBrief] = useState<BriefData | null>(null);
+  const [backToTopVisible, setBackToTopVisible] = useState(false);
 
-  // Initialize theme from localStorage or default to dark
+  const lenisRef = useRef<Lenis | null>(null);
+
+  // Theme State
   const [theme, setTheme] = useState<ThemeMode>(() => {
     try {
       const saved = localStorage.getItem('saikat_theme');
@@ -40,7 +39,6 @@ export default function App() {
     return 'dark';
   });
 
-  // Apply theme class to document
   useEffect(() => {
     const root = document.documentElement;
     if (theme === 'dark') {
@@ -59,120 +57,301 @@ export default function App() {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
+  // Lenis & Motion Engine Setup
+  useEffect(() => {
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    try {
+      const lenis = new Lenis({
+        smoothWheel: !isReducedMotion,
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+      lenisRef.current = lenis;
+
+      let rafId: number;
+      function raf(time: number) {
+        lenis.raf(time);
+        rafId = requestAnimationFrame(raf);
+      }
+      rafId = requestAnimationFrame(raf);
+
+      // Back to top scroll listener
+      const handleScroll = () => {
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
+        setBackToTopVisible(scrollY > 350);
+      };
+      lenis.on('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      return () => {
+        cancelAnimationFrame(rafId);
+        lenis.destroy();
+        window.removeEventListener('scroll', handleScroll);
+      };
+    } catch (err) {
+      console.warn('Lenis setup fallback:', err);
+    }
+  }, []);
+
+  // Text Animations & Intersection Observer
+  useEffect(() => {
+    const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Word text splitting
+    const wordElements = document.querySelectorAll<HTMLElement>('[data-motion="word"]');
+    wordElements.forEach((el) => {
+      if (el.dataset.splitDone) return;
+      el.dataset.splitDone = 'true';
+      const originalText = el.textContent?.trim() || '';
+      const words = originalText.split(/\s+/);
+      const stagger = parseFloat(el.getAttribute('data-stagger') || '18');
+      const baseDelay = parseFloat(el.getAttribute('data-delay') || '0');
+
+      el.innerHTML = words
+        .map((word, i) => {
+          const delay = baseDelay + i * stagger;
+          return `<span class="word-mask"><span class="word-inner" style="transition-delay: ${delay}ms;">${word}&nbsp;</span></span>`;
+        })
+        .join('');
+    });
+
+    // Line reveal stagger
+    const lineElements = document.querySelectorAll<HTMLElement>('[data-motion="line"]');
+    lineElements.forEach((el) => {
+      const stagger = parseFloat(el.getAttribute('data-stagger') || '90');
+      const lines = el.querySelectorAll<HTMLElement>('.line-inner');
+      lines.forEach((line, i) => {
+        line.style.transitionDelay = `${i * stagger}ms`;
+      });
+    });
+
+    // Delays
+    document.querySelectorAll<HTMLElement>('[data-stagger-index]').forEach((el) => {
+      const idx = parseFloat(el.getAttribute('data-stagger-index') || '0');
+      const stagger = parseFloat(el.getAttribute('data-stagger') || '90');
+      el.style.transitionDelay = `${idx * stagger}ms`;
+    });
+
+    document.querySelectorAll<HTMLElement>('[data-delay]').forEach((el) => {
+      if (el.getAttribute('data-motion') !== 'word') {
+        const delay = parseFloat(el.getAttribute('data-delay') || '0');
+        el.style.transitionDelay = `${delay}ms`;
+      }
+    });
+
+    // Intersection Observer
+    if (isReducedMotion) {
+      document.querySelectorAll('.motion-fade-up, .motion-fade, .motion-plate, [data-motion]').forEach((el) => {
+        el.classList.add('is-revealed');
+      });
+    } else {
+      const observer = new IntersectionObserver(
+        (entries, obs) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              obs.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0, rootMargin: '0px 0px -10% 0px' }
+      );
+
+      document.querySelectorAll('.motion-fade-up, .motion-fade, .motion-plate, [data-motion]').forEach((el) => {
+        observer.observe(el);
+      });
+
+      return () => observer.disconnect();
+    }
+  }, [currentView]);
+
+  // Navigation Handlers
   const handleNavigateHome = () => {
     setCurrentView('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileSidebarOpen(false);
+    setMenuOverlayOpen(false);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 0.8 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleNavigateProfile = () => {
     setCurrentView('profile');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileSidebarOpen(false);
+    setMenuOverlayOpen(false);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 0.8 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleSelectCategory = (cat: CategoryKey) => {
     setCurrentCategory(cat);
     setCurrentView('showcase');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setMobileSidebarOpen(false);
+    setMenuOverlayOpen(false);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 0.8 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleSeeWork = () => {
     if (currentView !== 'home') {
       setCurrentView('home');
       setTimeout(() => {
-        const el = document.getElementById('works');
-        el?.scrollIntoView({ behavior: 'smooth' });
+        const target = document.getElementById('about');
+        if (target && lenisRef.current) {
+          lenisRef.current.scrollTo(target, { offset: 0, duration: 1.0 });
+        } else {
+          target?.scrollIntoView({ behavior: 'smooth' });
+        }
       }, 100);
     } else {
-      const el = document.getElementById('works');
-      el?.scrollIntoView({ behavior: 'smooth' });
+      const target = document.getElementById('about');
+      if (target && lenisRef.current) {
+        lenisRef.current.scrollTo(target, { offset: 0, duration: 1.0 });
+      } else {
+        target?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleInitiateBriefing = () => {
+    if (currentView !== 'home') {
+      setCurrentView('home');
+      setTimeout(() => {
+        const target = document.getElementById('contact');
+        if (target && lenisRef.current) {
+          lenisRef.current.scrollTo(target, { offset: 0, duration: 1.0 });
+        } else {
+          target?.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else {
+      const target = document.getElementById('contact');
+      if (target && lenisRef.current) {
+        lenisRef.current.scrollTo(target, { offset: 0, duration: 1.0 });
+      } else {
+        target?.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleScrollTop = () => {
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { duration: 1.0 });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-[var(--canvas)] text-[var(--ink)] flex flex-col font-['Satoshi'] selection:bg-[var(--ink)] selection:text-[var(--canvas)]">
-      {/* Mobile Top Header */}
-      <MobileHeader
-        isMobileOpen={isMobileOpen}
-        onToggleMobile={() => setIsMobileOpen((prev) => !prev)}
-        onNavigateHome={handleNavigateHome}
-      />
+    <div id="top" className="site-root-layout">
+      {/* Floating Back to Top Button */}
+      <BackToTop visible={backToTopVisible} onScrollTop={handleScrollTop} />
 
-      {/* Main Sidebar (Persistent Desktop / Drawer Mobile) */}
+      {/* Persistent Full-Height Left Sidebar: Showcase Archetypes */}
       <Sidebar
         currentView={currentView}
         currentCategory={currentCategory}
         theme={theme}
-        isMobileOpen={isMobileOpen}
+        isOpen={mobileSidebarOpen}
         onSelectCategory={handleSelectCategory}
         onNavigateHome={handleNavigateHome}
         onNavigateProfile={handleNavigateProfile}
         onToggleTheme={toggleTheme}
-        onCloseMobile={() => setIsMobileOpen(false)}
+        onClose={() => setMobileSidebarOpen(false)}
       />
 
-      {/* Main Page Wrapper (Offset 290px on Desktop, 58px on Mobile) */}
-      <div className="lg:ml-[290px] pt-[58px] lg:pt-0 flex-1 flex flex-col w-full lg:w-[calc(100%-290px)] min-w-0 overflow-x-hidden">
-        <main className="flex-1 w-full">
-          {currentView === 'home' && (
-            <div className="w-full animate-fadeIn">
-              <HeroSection
-                onSeeWork={handleSeeWork}
-                onOpenBooking={() => setIsBookingOpen(true)}
-              />
-              <WorksSection
-                projects={projects}
-                onSelectProject={(proj) => setSelectedProject(proj)}
-                onOpenFullShowcase={handleSelectCategory}
-              />
-              <PrinciplesSection />
-              <TestimonialsSection testimonials={testimonials} />
-              <EngagementsSection />
-              <FaqSection />
-              <ContactSection onOpenBooking={() => setIsBookingOpen(true)} />
-            </div>
-          )}
+      {/* Main Site Wrapper (Offset for full-height left sidebar on desktop) */}
+      <div className="site-page-wrapper">
+        {/* Mobile Sticky Top Header (< 1024px) */}
+        <MobileTopBar
+          theme={theme}
+          onNavigateHome={handleNavigateHome}
+          onOpenSidebar={() => setMobileSidebarOpen(true)}
+          onToggleTheme={toggleTheme}
+          onToggleMenu={() => setMenuOverlayOpen((prev) => !prev)}
+        />
 
-          {currentView === 'showcase' && (
-            <div className="w-full animate-fadeIn">
-              <ShowcaseView
-                category={currentCategory}
-                projects={projects}
-                onSelectCategory={(cat) => setCurrentCategory(cat)}
-                onBackHome={handleNavigateHome}
-                onOpenProjectModal={(proj) => setSelectedProject(proj)}
-              />
-              <ContactSection onOpenBooking={() => setIsBookingOpen(true)} />
-            </div>
-          )}
+        {/* Home Page View Panel */}
+        <div id="home-view" className={`site-view-panel home-view-panel ${currentView === 'home' ? '' : 'is-hidden'}`}>
+          <HeroSection
+            onSeeWork={handleSeeWork}
+            onOpenBooking={() => setBookingModalOpen(true)}
+          />
+          <StatementSection />
+          <AboutSection
+            onInitiateBriefing={handleInitiateBriefing}
+            onNavigateProfile={handleNavigateProfile}
+          />
+          <PrinciplesSection />
+          <TestimonialsSection />
+          <EngagementsSection />
+          <FaqSection />
+          <PreFooterCta
+            onOpenBooking={() => setBookingModalOpen(true)}
+          />
+        </div>
 
-          {currentView === 'profile' && (
-            <div className="w-full animate-fadeIn">
-              <ProfileView
-                experience={experienceData}
-                skills={skillCategories}
-                certifications={certifications}
-                awards={awards}
-                onBackHome={handleNavigateHome}
-                onOpenBooking={() => setIsBookingOpen(true)}
-              />
-              <ContactSection onOpenBooking={() => setIsBookingOpen(true)} />
-            </div>
-          )}
-        </main>
+        {/* Dedicated Archetype Showcase View */}
+        <div id="showcase-view" className={`site-view-panel showcase-view-panel ${currentView === 'showcase' ? '' : 'is-hidden'}`}>
+          <ShowcaseView
+            currentCategory={currentCategory}
+            onSelectCategory={handleSelectCategory}
+            onNavigateHome={handleNavigateHome}
+            onOpenBrief={(brief) => setActiveBrief(brief)}
+          />
+        </div>
 
+        {/* Dedicated Profile View Panel */}
+        <div id="profile-view" className={`site-view-panel profile-view-panel ${currentView === 'profile' ? '' : 'is-hidden'}`}>
+          <ProfileView
+            onNavigateHome={handleNavigateHome}
+            onOpenBooking={() => setBookingModalOpen(true)}
+          />
+        </div>
+
+        {/* Footer */}
         <Footer />
       </div>
 
-      {/* Modals & Overlays */}
-      <ProjectModal
-        project={selectedProject}
-        onClose={() => setSelectedProject(null)}
+      {/* Modal Menu Overlay */}
+      <MenuOverlay
+        isOpen={menuOverlayOpen}
+        theme={theme}
+        onClose={() => setMenuOverlayOpen(false)}
+        onNavigateHome={handleNavigateHome}
+        onNavigateProfile={handleNavigateProfile}
+        onSelectCategory={handleSelectCategory}
+        onToggleTheme={toggleTheme}
+        onOpenBooking={() => {
+          setMenuOverlayOpen(false);
+          setBookingModalOpen(true);
+        }}
       />
+
+      {/* Interactive Case Study Modal */}
+      <BriefModal
+        brief={activeBrief}
+        onClose={() => setActiveBrief(null)}
+        onOpenBooking={() => {
+          setActiveBrief(null);
+          setBookingModalOpen(true);
+        }}
+      />
+
+      {/* Interactive 20-min Call Booking Modal */}
       <BookingModal
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
+        isOpen={bookingModalOpen}
+        onClose={() => setBookingModalOpen(false)}
       />
-      <BackToTop />
     </div>
   );
 }
