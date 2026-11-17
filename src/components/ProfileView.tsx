@@ -273,7 +273,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateHome, onOpen
         {/*  Role 06: RMS IT.  */}
         <article className="profile-timeline-item">
           <div className="timeline-meta-col">
-            <span className="timeline-dates">Oct 2014 – Dec 2015</span>
+            <span className="timeline-dates">Oct 2013 – Dec 2015</span>
             <p className="timeline-company"><strong>RMS IT.</strong>Dhaka, BD · Full Time</p>
             <span className="timeline-tenure-badge">Web &amp; Theme Dev</span>
           </div>

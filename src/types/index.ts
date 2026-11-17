@@ -32,14 +32,14 @@ export interface Project {
   subtitle?: string;
   client: string;
   year: string;
-  category: CategoryKey;
+  category: CategoryKey | string;
   roi: string;
   roiPills?: string[];
   pills?: string[];
   catLabel?: string;
   challenge?: string;
   solution?: string;
-  tech?: string[];
+  tech?: string | string[];
   techStack?: string[];
   image?: string;
   caseStudyUrl?: string;
@@ -81,16 +81,25 @@ export interface Award {
 export interface ExperienceItem {
   id?: string;
   company: string;
-  role: string;
+  role?: string;
+  roleTitle?: string;
+  location?: string;
   period: string;
-  description: string;
+  tenureBadge?: string;
+  description?: string;
+  isCurrent?: boolean;
+  progressionNote?: string;
   highlights?: string[];
-  subroles?: { role?: string; title?: string; period: string; details: string }[];
+  tags?: string[];
+  subroles?: { role?: string; title?: string; period: string; details?: string; highlights?: string[] }[];
 }
 
 export interface SkillCategory {
   id?: string;
+  number?: string;
+  num?: string;
   title: string;
+  description?: string;
   skills: string[];
 }
 
