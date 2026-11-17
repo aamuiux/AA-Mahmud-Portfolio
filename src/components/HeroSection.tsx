@@ -23,20 +23,20 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onSeeWork, onOpenBooki
       <div className="hero-content">
         <div className="status-pill motion-fade" data-motion="fade">
           <span className="status-dot" aria-hidden="true"></span>
-          <span>Lead UI/UX Designer &amp; Product Strategist · 12+ Years Experience</span>
+          <span>Lead UI/UX Designer · 12+ Yrs · SaaS, Fintech &amp; AI</span>
         </div>
 
         <h1 className="hero-title">
-          <span className="line-mask"><span className="line-inner">Bridging UX Strategy,</span></span>
-          <span className="line-mask"><span className="line-inner">Complex Systems &amp;</span></span>
-          <span className="line-mask"><span className="line-inner">Measurable ROI.</span></span>
+          <span className="line-mask"><span className="line-inner">Design that lifts</span></span>
+          <span className="line-mask"><span className="line-inner">onboarding, retention</span></span>
+          <span className="line-mask"><span className="line-inner"><span className="accent">and</span> revenue.</span></span>
         </h1>
 
-        <p className="hero-lead" data-motion="word" data-delay="500" data-stagger="18">
-          If you're balancing user expectations, business priorities, and technical constraints, I can help you find clarity and connect the dots, make confident design decisions, and lead teams toward solutions that make a real difference and create value with usable solution.
+        <p className="hero-lead" data-motion="word" data-delay="400" data-stagger="18">
+          Turning complex Fintech, Enterprise SaaS, and AI workflows into high-converting products people love.
         </p>
 
-        <div className="hero-cta-row motion-fade-up" data-motion="fade-up" data-delay="800">
+        <div className="hero-cta-row motion-fade-up" data-motion="fade-up" data-delay="650">
           <button type="button" onClick={onSeeWork} className="cta-btn solid-light cursor-pointer">
             <span>See my work</span>
             <span className="arrow" aria-hidden="true">→</span>
